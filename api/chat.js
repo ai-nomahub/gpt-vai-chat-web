@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const { prompt, message } = req.body;
 
     // force redeploy: webhook to production
-    const response = await fetch("https://phamhai.app.n8n.cloud/webhook/gpt-vai-chat", {
+    const response = await fetch("https://phamhai.app.n8n.cloud/webhook/c66b0484-d38e-4cda-85c6-1b728c13981f", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
