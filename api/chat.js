@@ -1,10 +1,10 @@
 export default async function handler(req, res) {
-  // Chấp nhận mọi phương thức preflight
+  // Xử lý CORS preflight
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com"); // có thể đổi thành domain cố định
+    res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    return res.status(200).end(); // Trả về 200 cho preflight
+    return res.status(200).end();
   }
 
   if (req.method !== "POST") {
@@ -12,24 +12,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, message } = req.body;
+    const { prompt, vai } = req.body;
 
-    const response = await fetch("https://phamhai.app.n8n.cloud/webhook/gpt-vai-chat-v2", {
+    const messages = [
+      { role: "system", content: vai || "Bạn là trợ lý AI thông minh." },
+      { role: "user", content: prompt }
+    ];
+
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
-      body: JSON.stringify({ prompt, message })
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages,
+        temperature: 0.7
+      })
     });
 
-    const data = await response.json();
+    const result = await openaiRes.json();
 
-    // CORS response headers
+    if (!openaiRes.ok) {
+      throw new Error(result.error?.message || "OpenAI error");
+    }
+
+    const reply = result.choices?.[0]?.message?.content || "[Không có phản hồi hợp lệ từ GPT]";
+
     res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    res.status(200).json(data);
+    res.status(200).json({ reply });
   } catch (error) {
-    res.status(500).json({ error: "Proxy error", details: error.message });
+    res.status(500).json({ error: "GPT proxy error", details: error.message });
   }
 }
