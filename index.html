@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>GPT Vai Chat</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    textarea, button, select { width: 100%; padding: 10px; margin: 10px 0; }
+    #response { background: #eee; padding: 15px; min-height: 100px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>GPT Vai Chat</h2>
+
+  <label>Chọn vai:</label>
+  <select id="vai">
+    <option value="Giám đốc sản xuất">Giám đốc sản xuất</option>
+    <option value="Chuyên viên nhân lực">Chuyên viên nhân lực</option>
+    <option value="Chuyên gia giáo dục">Chuyên gia giáo dục</option>
+    <option value="Chiến lược kinh doanh">Chiến lược kinh doanh</option>
+  </select>
+
+  <label>Nhập câu hỏi:</label>
+  <textarea id="question" rows="4" placeholder="Ví dụ: Vai của bạn là gì?"></textarea>
+
+  <button onclick="go()">Gửi yêu cầu</button>
+  <div id="response">...</div>
+
+  <script>
+    async function go() {
+      const prompt = document.getElementById('vai').value;
+      const message = document.getElementById('question').value.trim();
+      if (!message) return;
+
+      document.getElementById("response").textContent = "⏳ Đang gửi...";
+
+      try {
+        const res = await fetch("https://phamhai.app.n8n.cloud/webhook-test/gpt-vai-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, message })
+        });
+
+        const data = await res.json();
+        document.getElementById("response").textContent = data.reply || "Không nhận được phản hồi từ GPT.";
+      } catch (e) {
+        document.getElementById("response").textContent = "❌ Lỗi gọi webhook: " + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
