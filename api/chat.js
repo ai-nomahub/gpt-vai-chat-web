@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     // CORS response headers
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     res.status(200).json(data);
