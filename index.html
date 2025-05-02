@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>GPT Vai Chat</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    textarea, button { width: 100%; padding: 10px; margin: 10px 0; }
+    #response { background: #eee; padding: 15px; min-height: 100px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>GPT Vai Chat – Gọi thẳng OpenAI</h2>
+  <label>Chọn vai:</label>
+  <select id="vai">
+    <option value="Bạn là Giám đốc sản xuất, phản xạ như một quản lý nhà máy chuyên nghiệp.">Giám đốc sản xuất</option>
+    <option value="Bạn là Chuyên viên nhân lực, phụ trách vận hành và đào tạo trong môi trường sản xuất.">Chuyên viên nhân lực</option>
+    <option value="Bạn là Chuyên gia giáo dục, hướng dẫn học sinh theo hướng cá nhân hóa.">Chuyên gia giáo dục</option>
+    <option value="Bạn là Chiến lược gia kinh doanh, chuyên đề xuất mô hình kinh doanh đột phá.">Chiến lược kinh doanh</option>
+  </select>
+  <label>Nhập câu hỏi:</label>
+  <textarea id="question" rows="4" placeholder="Ví dụ: Làm sao cải tiến quy trình đầu ca?"></textarea>
+  <button onclick="go()">Gửi yêu cầu</button>
+  <div id="response">...</div>
+  <script>
+    async function go() {
+      const vai = document.getElementById('vai').value;
+      const prompt = document.getElementById('question').value.trim();
+      if (!prompt) return;
+      document.getElementById("response").textContent = "⏳ Đang gửi...";
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ vai, prompt })
+        });
+        const data = await res.json();
+        document.getElementById("response").textContent = data.reply || "Không nhận được phản hồi từ GPT.";
+      } catch (e) {
+        document.getElementById("response").textContent = "❌ Lỗi proxy: " + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
