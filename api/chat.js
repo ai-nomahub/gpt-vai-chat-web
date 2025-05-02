@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   try {
     const { prompt, message } = req.body;
 
-    const response = await fetch("https://phamhai.app.n8n.cloud/webhook-test/gpt-vai-chat", {
+    const response = await fetch("https://phamhai.app.n8n.cloud/webhook/gpt-vai-chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
