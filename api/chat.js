@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Xử lý preflight CORS nếu dùng cross-domain
+  // CORS preflight
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -7,6 +7,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Chỉ chấp nhận POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
     const { vai, prompt } = req.body;
 
     const messages = [
-      { role: "system", content: vai || "Bạn là một trợ lý AI thông minh." },
+      { role: "system", content: vai || "Bạn là trợ lý AI phản hồi đúng vai." },
       { role: "user", content: prompt }
     ];
 
@@ -35,10 +36,10 @@ export default async function handler(req, res) {
     const result = await openaiRes.json();
 
     if (!openaiRes.ok) {
-      throw new Error(result.error?.message || "OpenAI error");
+      throw new Error(result.error?.message || "OpenAI API error");
     }
 
-    const reply = result.choices?.[0]?.message?.content || "[GPT không phản hồi]";
+    const reply = result.choices?.[0]?.message?.content || "[GPT không phản hồi hợp lệ]";
 
     res.setHeader("Access-Control-Allow-Origin", "https://chat.nomahubvn.com");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
